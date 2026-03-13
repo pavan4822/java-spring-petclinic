@@ -2,7 +2,7 @@ pipeline {
     agent { label "spc-java" }
 
     triggers {
-        pollSCM('* * * * *')
+        pollSCM ('* * * * *')
     }
 
     stages {
