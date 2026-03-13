@@ -5,13 +5,6 @@ pipeline {
         pollSCM('* * * * *')
     }
 
-    stages {
-        stage('Clone Code') {
-           steps {
-               git branch: 'main',
-               url: 'https://github.com/pavan4822/java-spring-petclinic.git'
-    }
-}
 
         stage('SonarCloud Scan') {
             steps {
