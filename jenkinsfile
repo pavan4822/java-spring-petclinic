@@ -1,30 +1,46 @@
 pipeline {
-    agent {label 'pavan-scp-project'}
-    
-     triggers {
+    agent {label "SPC" }
+
+    triggers {
         pollSCM('* * * * *')
     }
 
+    stages {
 
-        stage('SonarCloud Scan') {
+        stage('git checkout') {
             steps {
-                withSonarQubeEnv('sonarcloud') {
-                    sh '''
-                    -Dsonar.projectKey=java-spring-petclinic \
-                    -Dsonar.organization=pavan4822 \
-                    -Dsonar.host.url=https://sonarcloud.io \
-                    -Dsonar.login=$sonar-id
-                    '''
+                git url : 'https://github.com/pavan4822/java-spring-petclinic.git'
+                branch : 'main'
+            }
+        }
+
+        stage('build and scan'){
+            steps {
+                withCredentials([string(credentialsId:'sonar-id', variable: 'SONAR_TOKEN')]){
+                withSonarQubeEnv('SONAR'){
+                sh """ mvn clean package sonar:sonar \
+                        -Dsonar.projectKey=java-spring-petclinic \
+                        -Dsonar.organization=pavan4822 \
+                        -Dsonar.host.url=https://sonarcloud.io \
+                        -Dsonar.login=$SONAR_TOKEN
+                    """
                 }
+                }
+            }
+        }
+
+        stage('Test Report') {
+            steps {
+                junit 'target/surefire-reports/*.xml'
             }
         }
 
         stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
+    steps {
+        timeout(time: 10, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
         }
+    }
+}
     }
 }
