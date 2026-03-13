@@ -1,5 +1,5 @@
 pipeline {
-    agent {label 'pavan-spc-project'}
+    agent {label 'pavan-scp-project'}
     
      triggers {
         pollSCM('* * * * *')
