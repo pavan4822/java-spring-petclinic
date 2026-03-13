@@ -6,13 +6,12 @@ pipeline {
     }
 
     stages {
-
-        stage('Cloning Code') {
-            steps {
-                git 'https://github.com/pavan4822/java-spring-petclinic.git'
-                  branch 'main'
-            }
-        }
+        stage('Clone Code') {
+           steps {
+               git branch: 'main',
+               url: 'https://github.com/pavan4822/java-spring-petclinic.git'
+    }
+}
 
         stage('SonarCloud Scan') {
             steps {
