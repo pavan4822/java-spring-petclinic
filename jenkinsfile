@@ -1,0 +1,38 @@
+pipeline {
+    agent {label 'SPC'}
+    
+    trigger{
+        pollSCM('* * * * *')
+    }
+
+    stages {
+
+        stage('Cloning Code') {
+            steps {
+                git 'https://github.com/pavan4822/java-spring-petclinic.git'
+                  branch 'main'
+            }
+        }
+
+        stage('SonarCloud Scan') {
+            steps {
+                withSonarQubeEnv('sonarcloud') {
+                    sh '''
+                    -Dsonar.projectKey=java-spring-petclinic \
+                    -Dsonar.organization=pavan4822 \
+                    -Dsonar.host.url=https://sonarcloud.io \
+                    -Dsonar.login=$sonar-id
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+    }
+}
